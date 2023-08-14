@@ -5,28 +5,12 @@ def int_to_binary(numero):
         es_negativo= True
         entero = entero *-1
     decimal = round((numero - entero),10)
-    lista_bin = []
-    lista_bin_decimal = []
-   
-    while entero != 0:
-        lista_bin.append(entero % 2)
-        entero = entero // 2
-    lista_bin.reverse()
-    contador = 0
-    temp = len(str(decimal))-1
-    while contador < len(str(decimal))-1:
-        if decimal == 0.0 or decimal == 1.0: #continuar
-            break
-        if (decimal*2.0 >= 1.0):
-            lista_bin_decimal.append(1.0)
-            decimal = decimal*2.0 - 1.0
-        elif(decimal*2.0 < 1.0):
-            lista_bin_decimal.append(0.0)
-            decimal = decimal*2.0
-        contador +=1
-    if es_negativo == True:
-        lista_bin = negacion_binary(lista_bin)
-    lista_bin = lista_bin +lista_bin_decimal
+    
+    entero= entero_bin(entero)
+    decimal= decimal_bin(decimal)
+    entero.append('.')
+    entero = entero + decimal
+    return(entero,es_negativo)
 
 def negacion_binary(lista):#resive array
     contador=0
@@ -74,27 +58,99 @@ def suma_bin(num1,num2):# mismo largo
     return num_fin
 
 def normalizacion_largo(num_1,num_2):   #llegan como arrays
-    if len(num_1)>=len(num_2):
-        largo=len(num_1)
-        i = len(num_2)
-        num_2.reverse()
-        while i < largo:
-            num_2.append("0")
-            i +=1
-        num_2.reverse()
-    elif len(num_1)<len(num_2):
-        largo=len(num_2)
-        i = len(num_1)
-        num_1.reverse()
-        while i < largo-1:  #probar
-            num_1.append("0")
-            i +=1
-        num_1.reverse()
-    return num_1,num_2
-lista_1 =[0,1,0]
-lista_2 =[0,1,1,9,9,0]
+    num_1,pos_punto_inicial_1,orden_1 = modo_cientifico(num_1)
+    num_2,pos_punto_inicial_2,orden_2 = modo_cientifico(num_2)
+    if orden_1 == orden_2:
+        return(num_1,num_2)
+    elif orden_1>orden_2:
+        #pos_punto_inicial_2 +=1
+        if pos_punto_inicial_2 == -1:
+            num_2.insert(-orden_1,'.')
+            return(num_1,num_2)
+        else:
+            num_2.pop(pos_punto_inicial_2-1) #revisar
+            num_2.insert(orden_1+1,'.')
+            return(num_1,num_2)
+    elif orden_1<orden_2:
+        if pos_punto_inicial_1 == -1:
+            num_1.insert(-orden_2,'.')
+            return(num_1,num_2)
+        else: #arreglar :v
+            num_1.pop(pos_punto_inicial_1-1) #revisar
+            num_1.insert(orden_2+1,'.')
+            return(num_1,num_2)
 
-print(int_to_binary(47.5))
+
+
+def binary_to_32bits(numero,es_negativo): #llega array , bool
+    numero,pos_punto_inicial,orden = modo_cientifico(numero)
+
+    numero_final=[]
+    if es_negativo == False:
+        numero_final.append(0)
+    else:
+        numero_final.append(1)
+    exponent,y = int_to_binary(127+ orden)
+    exponent.remove('.')
+    while len(exponent)<8:    #revisar
+        exponent.insert(0,0)
+    numero_final= numero_final +exponent
+
+    mantissa = numero[pos_punto_inicial:]
+    while len(mantissa)< 23:
+        mantissa.append(0)
+    numero_final =numero_final +mantissa
+    return numero_final #return array len 32
+
+def entero_bin(entero):
+    bin__entero = []
+    while entero != 0:
+        bin__entero.append(entero % 2)
+        entero = entero // 2
+    bin__entero.reverse()
+    return bin__entero
+
+def decimal_bin(decimal):
+    bin_decimal = []
+    contador = 0
+    limite = len(str(decimal))-1 #confirmar largo
+    while contador < limite:
+        if decimal == 0.0 or decimal == 1.0:
+            break
+        if (decimal*2.0 >= 1.0):
+            bin_decimal.append(1)
+            decimal = decimal*2.0 - 1.0
+        elif(decimal*2.0 < 1.0):
+            bin_decimal.append(0)
+            decimal = decimal*2.0
+        contador +=1
+    return bin_decimal
+lista_1 =[0,1,0,0,'.',1,0,1,0,1,1]
+lista_2 =[0,1,0,9,9,9,'.',2,9,9,9,9,9,2]
+
+
+def modo_cientifico(numero):
+    i = 0
+    pos_punto_inicial = -1
+    while i <len(numero):
+        if numero[i] == '.':
+            pos_punto_inicial = i
+            break
+        i += 1
+    i = 0
+    pos_primer_1 =-1
+    while i <len(numero):
+        if int(numero[i]) == 1:
+            pos_primer_1 = i
+            break
+        i += 1
+    orden = 0
+    if pos_punto_inicial != -1:
+        orden= pos_punto_inicial-pos_primer_1-1
+        numero.pop(pos_punto_inicial)
+        numero.insert(pos_primer_1+1,'.')
+    return (numero,pos_punto_inicial,orden)
+
 x,y =normalizacion_largo(lista_1,lista_2)
 
 print(x)
