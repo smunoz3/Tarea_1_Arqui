@@ -1,4 +1,8 @@
 def int_to_binary(numero):
+    '''
+    recibe un int y lo trasnforma a binario, guardandolo en una lista 
+    Retorna lista de numero en binario y si signo
+    '''
     es_negativo = False #(flag)
     entero = int(numero) #:V
     if entero <0:
@@ -13,6 +17,9 @@ def int_to_binary(numero):
     return(entero,es_negativo)
 
 def negacion_binary(lista):#resive array
+    '''
+    puede que no se use
+    '''
     contador=0
     for i in lista:
         if int(i) == 0:
@@ -24,6 +31,11 @@ def negacion_binary(lista):#resive array
     return(lista)
 
 def suma_bin(num1,num2):# mismo largo
+    '''
+    resive 2 int, llama a normalizacion_largo, 
+    y cuando tienen el mismo largo los suma
+    retorna una lista con el numero final en binario
+    '''
     num1, num2=normalizacion_largo(num1,num2)
     num1.reverse()
     num2.reverse()
@@ -58,6 +70,11 @@ def suma_bin(num1,num2):# mismo largo
     return num_fin
 
 def normalizacion_largo(num_1,num_2):   #llegan como arrays
+    '''
+    resive 2 numeros (listas) en binario y les iguala el largo
+    # revisar posible que este mal
+    retorna los 2 numeros con el mismo largo 
+    '''
     num_1,pos_punto_inicial_1,orden_1 = modo_cientifico(num_1)
     num_2,pos_punto_inicial_2,orden_2 = modo_cientifico(num_2)
     if orden_1 == orden_2:
@@ -76,13 +93,17 @@ def normalizacion_largo(num_1,num_2):   #llegan como arrays
             num_1.insert(-orden_2,'.')
             return(num_1,num_2)
         else: #arreglar :v
-            num_1.pop(pos_punto_inicial_1-1) #revisar
-            num_1.insert(orden_2+1,'.')
+            num_1.pop(pos_punto_inicial_1-orden_1) #revisar
+            num_1.insert(orden_2,'.')
             return(num_1,num_2)
 
 
 
 def binary_to_32bits(numero,es_negativo): #llega array , bool
+    '''
+    resive un numero en binario y si signo y lo construye en base 32 bits
+    retorna el numero(lista) de 32bits
+    '''
     numero,pos_punto_inicial,orden = modo_cientifico(numero)
 
     numero_final=[]
@@ -103,6 +124,9 @@ def binary_to_32bits(numero,es_negativo): #llega array , bool
     return numero_final #return array len 32
 
 def entero_bin(entero):
+    '''
+    trivial
+    '''
     bin__entero = []
     while entero != 0:
         bin__entero.append(entero % 2)
@@ -111,6 +135,9 @@ def entero_bin(entero):
     return bin__entero
 
 def decimal_bin(decimal):
+    '''
+    trivial
+    '''
     bin_decimal = []
     contador = 0
     limite = len(str(decimal))-1 #confirmar largo
@@ -125,11 +152,12 @@ def decimal_bin(decimal):
             decimal = decimal*2.0
         contador +=1
     return bin_decimal
-lista_1 =[0,1,0,0,'.',1,0,1,0,1,1]
-lista_2 =[0,1,0,9,9,9,'.',2,9,9,9,9,9,2]
-
 
 def modo_cientifico(numero):
+    '''
+    resive un numero binario con punto (coma) y mueve el punto al primer uno de la izquierda
+    retorna un numero (lista) con el punto despues del primer 1
+    '''
     i = 0
     pos_punto_inicial = -1
     while i <len(numero):
@@ -151,7 +179,10 @@ def modo_cientifico(numero):
         numero.insert(pos_primer_1+1,'.')
     return (numero,pos_punto_inicial,orden)
 
+lista_1 =[0,1,0,0,'.',1,0,1,0,1,1]
+lista_2 =[0,1,0,9,9,9,'.',2,9,9,9,9,9,2]
 x,y =normalizacion_largo(lista_1,lista_2)
 
+y = int_to_binary(54)
 print(x)
 print(y)
