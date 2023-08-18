@@ -1,6 +1,6 @@
 def int_to_binary(numero):
     '''
-    recibe un int y lo trasnforma a binario, guardandolo en una lista 
+    recibe un int y lo trasnforma a binario, guardandolo en una lista
     Retorna lista de numero en binario y si signo
     '''
     es_negativo = False #(flag)
@@ -9,7 +9,7 @@ def int_to_binary(numero):
         es_negativo= True
         entero = entero *-1
     decimal = round((numero - entero),10)
-    
+   
     entero= entero_bin(entero)
     decimal= decimal_bin(decimal)
     entero.append('.')
@@ -32,11 +32,11 @@ def negacion_binary(lista):#resive array
 
 def suma_bin(num1,num2):# mismo largo
     '''
-    resive 2 int, llama a normalizacion_largo, 
+    resive 2 int, llama a normalizacion_largo,
     y cuando tienen el mismo largo los suma
     retorna una lista con el numero final en binario
     '''
-    num1, num2=normalizacion_largo(num1,num2)
+    num1, num2, orden =normalizacion_largo(num1,num2)
     num1.reverse()
     num2.reverse()
     num_fin =[]
@@ -73,29 +73,40 @@ def normalizacion_largo(num_1,num_2):   #llegan como arrays
     '''
     resive 2 numeros (listas) en binario y les iguala el largo
     # revisar posible que este mal
-    retorna los 2 numeros con el mismo largo 
+    retorna los 2 numeros con el mismo largo
     '''
-    num_1,pos_punto_inicial_1,orden_1 = modo_cientifico(num_1)
-    num_2,pos_punto_inicial_2,orden_2 = modo_cientifico(num_2)
+    num_1,pos_primer_1_1,pos_punto_inicial_1,orden_1 = modo_cientifico(num_1)
+    num_2,pos_primer_1_2,pos_punto_inicial_2,orden_2 = modo_cientifico(num_2)
     if orden_1 == orden_2:
-        return(num_1,num_2)
+        return(num_1,num_2,orden_2)
+   
+    #Se llega al orden de 1
     elif orden_1>orden_2:
         #pos_punto_inicial_2 +=1
         if pos_punto_inicial_2 == -1:
             num_2.insert(-orden_1,'.')
-            return(num_1,num_2)
+            return(num_1,num_2,orden_1)
         else:
-            num_2.pop(pos_punto_inicial_2-1) #revisar
-            num_2.insert(orden_1+1,'.')
-            return(num_1,num_2)
+            num_1.pop(pos_primer_1_1+1) #revisar
+            num_1.insert(pos_primer_1_1 + 1 + (orden_1-orden_2),'.')
+            return(num_1,num_2,orden_2)
+        '''
+        try:
+            text[i+1]
+        except IndexError:
+            return False
+        '''
+    #Se llega al orden de 2
     elif orden_1<orden_2:
         if pos_punto_inicial_1 == -1:
             num_1.insert(-orden_2,'.')
-            return(num_1,num_2)
-        else: #arreglar :v
-            num_1.pop(pos_punto_inicial_1-orden_1) #revisar
-            num_1.insert(orden_2,'.')
-            return(num_1,num_2)
+            return(num_1,num_2,orden_2)
+        else: #arreglar :vnormalizacion_largo(num1,num2)
+            num_2.pop(pos_primer_1_2+1) #revisar
+            temp = pos_primer_1_2 + 1 + (orden_2-orden_1)
+            temp_2 = len(num_2)
+            num_2.insert(pos_primer_1_2 + 1 + (orden_2-orden_1),'.')
+            return(num_1,num_2,orden_1)
 
 
 
@@ -104,7 +115,7 @@ def binary_to_32bits(numero,es_negativo): #llega array , bool
     resive un numero en binario y si signo y lo construye en base 32 bits
     retorna el numero(lista) de 32bits
     '''
-    numero,pos_punto_inicial,orden = modo_cientifico(numero)
+    numero,pos_primer_1,pos_punto_inicial,orden = modo_cientifico(numero)
 
     numero_final=[]
     if es_negativo == False:
@@ -115,9 +126,9 @@ def binary_to_32bits(numero,es_negativo): #llega array , bool
     exponent.remove('.')
     while len(exponent)<8:    #revisar
         exponent.insert(0,0)
-    numero_final= numero_final +exponent
+    numero_final= numero_final + exponent
 
-    mantissa = numero[pos_punto_inicial:]
+    mantissa = numero[pos_primer_1+2:]
     while len(mantissa)< 23:
         mantissa.append(0)
     numero_final =numero_final +mantissa
@@ -153,6 +164,7 @@ def decimal_bin(decimal):
         contador +=1
     return bin_decimal
 
+#Ta weno
 def modo_cientifico(numero):
     '''
     resive un numero binario con punto (coma) y mueve el punto al primer uno de la izquierda
@@ -177,12 +189,12 @@ def modo_cientifico(numero):
         orden= pos_punto_inicial-pos_primer_1-1
         numero.pop(pos_punto_inicial)
         numero.insert(pos_primer_1+1,'.')
-    return (numero,pos_punto_inicial,orden)
+    return (numero,pos_primer_1,pos_punto_inicial,orden)
 
-lista_1 =[0,1,0,0,'.',1,0,1,0,1,1]
-lista_2 =[0,1,0,9,9,9,'.',2,9,9,9,9,9,2]
-x,y =normalizacion_largo(lista_1,lista_2)
+lista_1 =[0,1,1,0,0,0,0,0,0,0,'.',0]
+lista_2 =[1,'.',0,1,0,0]
+x =suma_bin(lista_1,lista_2)
 
 y = int_to_binary(54)
 print(x)
-print(y)
+#print(y)
