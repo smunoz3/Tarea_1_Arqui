@@ -38,7 +38,7 @@ def int_to_binary(numero):
     if entero <0:
         es_negativo= True
         entero = entero *-1
-    decimal = round((numero - entero),10)
+    decimal = round((abs(numero) - entero),10)
    
     entero= entero_bin(entero)
     decimal= decimal_bin(decimal,len(entero)-1)
@@ -70,23 +70,44 @@ def suma_bin(num1,num2):# mismo largo
     mantissa2.insert(0,'.')
     mantissa2.insert(0,1)
 
+    #Eliminar 0 innecesarios en la mantissa
+    # i = 1
+    # while i <= len(mantissa1):
+    #     if mantissa1[-i] == 1:
+    #         break
+    #     else:
+    #         mantissa1.pop(-i)
+
+    # i = 1
+    # while i <= len(mantissa2):
+    #     if mantissa2[-i] == 1:
+    #         break
+    #     else:
+    #         mantissa2.pop(-i)
+
+
     shift = exponente1 - exponente2
     if shift < 0:
         i = 0
         while i != abs(shift):
-            mantissa1.pop(i+1)
-            mantissa1.insert(i+2,'.')
+            mantissa1.pop(1)
+            mantissa1.insert(0,'.')
+            mantissa1.insert(0,0)
             i += 1
         orden = exponente2 - 127
 
     elif shift > 0:
         i = 0
         while i != shift:
-            mantissa2.pop(i+1)
-            mantissa2.insert(i+2,'.')
+            mantissa2.pop(1)
+            mantissa2.insert(0,'.')
+            mantissa2.insert(0,0)
             i += 1
         orden = exponente1 - 127
     
+    a = 0
+    mantissa1_temp = mantissa1.copy()
+    mantissa2_temp = mantissa2.copy()
     mantissa1.remove('.')
     mantissa2.remove('.')
     mantissa1.reverse()
@@ -97,7 +118,15 @@ def suma_bin(num1,num2):# mismo largo
     contador = 0
     carri = 0
 
-    while contador<len(mantissa1):
+    #Rellenar con 0 la mantissa mas pequeña
+    while len(mantissa1) != len(mantissa2):
+        if len(mantissa1) > len(mantissa2):
+            mantissa2.insert(0,0)
+        elif len(mantissa1) < len(mantissa2):
+            mantissa1.insert(0,0)
+    
+
+    while contador<len(mantissa1) or contador<len(mantissa2):
         if (mantissa1[contador] == 0)and(mantissa1[contador] == mantissa2[contador]): #ambos 0
             if carri == 1:
                 suma.append(1)
@@ -117,11 +146,30 @@ def suma_bin(num1,num2):# mismo largo
                 suma.append(1)
         contador +=1
     
+    a= 0
+    if mantissa1[-1] == 1 and mantissa2[-1] == 1:
+        suma.append(0)
+        suma.append(1)
     suma.reverse()
-    suma.insert(orden,'.')
+    
+    if mantissa1[-1] == 1 and mantissa2[-1] == 1:
+        suma.insert(2,'.')
+    else:
+        suma.insert(1,'.')
 
-    suma,pos_primer_1,mov_punto = modo_cientifico(suma)
-    orden += mov_punto
+    #suma,pos_primer_1,mov_punto = modo_cientifico(suma)
+    #orden += mov_punto
+
+    #Eliminar los 0 antes del primer punto
+    i = 0
+    while i < len(suma):
+        if suma[i] == 1:
+            break
+        else:
+            suma.pop(0)
+
+    
+    #Falta redondear a 23 bits
 
     return suma,orden
 
@@ -171,7 +219,7 @@ def sum_to_32bits(numero,orden,es_negativo):
             break
         i += 1
 
-    mantissa = numero[pos_punto:]
+    mantissa = numero[pos_punto+1:]
     while len(mantissa)< 23:
         mantissa.append(0)
     numero_final =numero_final +mantissa
@@ -219,6 +267,23 @@ def binary_to_int(binario):
         i += 1
     return decimal
 
+def bits32_to_dec(numero):
+    signo = numero[0]
+    exponente = numero[1:9]
+    exponente = binary_to_int(exponente)  #Exponente esta en int
+    orden = exponente - 127
+    mantissa = numero[9:]
+    mantissa_dec = 0
+
+    i = 1
+    while i <= len(mantissa):
+        exp = -i
+        mantissa_dec += mantissa[i-1] * (2**exp)
+        i += 1
+
+    num_final = ((-1)**signo) * (1 + mantissa_dec) * (2**orden)
+
+    return num_final
 
 #main()
 lineas_totales = 0
@@ -241,7 +306,8 @@ with open("operaciones.txt", "r") as archivo:
         else:
             lineas_sum +=1
             suma,orden = suma_bin(bin1,bin2)
-            resultado = sum_to_32bits(suma,orden,bin1[0])
-            resultado = "".join([str(elemento) for elemento in resultado])
+            resultado_bin_32 = sum_to_32bits(suma,orden,bin1[0])
+            resultado_dec = bits32_to_dec(resultado_bin_32)
+            resultado_bin_32 = "".join([str(elemento) for elemento in resultado_bin_32])
             with open("resultados.txt" , "a") as arch_resultados:
-                arch_resultados.write(resultado+'/'+'resultado_bin_32'+'\n')
+                arch_resultados.write(str(resultado_dec)+'/'+resultado_bin_32+'\n')
