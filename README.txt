@@ -12,7 +12,11 @@ Especificacion de los algoritmos y desarrollo realizado:
     M = mantissa recorrida de izquierda a derecha y multiplicando el valor de
     la posicion por potencias de 2, elevadas desde -1 hasta recorrer toda la mantissa
     O = orden
+    -Se redondeo al tercer decimal
 
 Supuestos:
     -La cantidad de numeros positivos y negativos imprimidos en pantalla
-    son aquellos de las sumas y no de las sumas no realizadas
+    son aquellos de las sumas y no de las sumas no realizadas.
+
+Instrucciones:
+    -El archivo a leer se debe llamar "operaciones.txt"
